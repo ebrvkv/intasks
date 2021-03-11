@@ -28,11 +28,13 @@ func makeRequests(ctx context.Context, wg *sync.WaitGroup, amount int, reqChan c
 	if err != nil {
 		panic(err)
 	}
+	t := time.NewTicker(time.Duration(period) * time.Millisecond)
+	defer t.Stop()
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.NewTicker(time.Duration(period) * time.Millisecond).C:
+		case <-t.C:
 			amount *= multiplier
 			for i := 0; i < amount; i++ {
 				wg.Add(1)
