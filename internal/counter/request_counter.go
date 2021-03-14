@@ -6,7 +6,7 @@ type Request interface {
 	Get() int64
 	Inc()
 	Reduce()
-	Stop()
+	Stop() bool
 	Stopped() bool
 }
 
@@ -20,10 +20,14 @@ func NewReqCounter() Request {
 	return &requestImpl{}
 }
 
-func (rc *requestImpl) Stop() {
+func (rc *requestImpl) Stop() bool {
 	rc.Lock()
+	defer rc.Unlock()
+	if rc.stopped {
+		return false
+	}
 	rc.stopped = true
-	rc.Unlock()
+	return rc.stopped
 }
 
 func (rc *requestImpl) Stopped() bool {

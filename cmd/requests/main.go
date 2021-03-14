@@ -43,8 +43,7 @@ func makeRequests(ctx context.Context, wg *sync.WaitGroup, amount int, reqChan c
 					cnt.Inc()
 					resp, err := client.Do(req)
 					cnt.Reduce()
-					if err != nil && strings.Contains(err.Error(), "Timeout") && !cnt.Stopped() {
-						cnt.Stop()
+					if err != nil && strings.Contains(err.Error(), "deadline exceeded") && cnt.Stop() {
 						reqChan <- cnt.Get()
 					}
 					if resp != nil {
